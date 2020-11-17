@@ -28,6 +28,9 @@ class RoutePlanner {
 
     float distance = 0.0f;
     RouteModel &m_Model;
+
+    // helper method for sorting open_list by cost values (g-value + h-value)
+    static bool CompareNodes(const RouteModel::Node *a, const RouteModel::Node *b);
 };
 
 #endif
