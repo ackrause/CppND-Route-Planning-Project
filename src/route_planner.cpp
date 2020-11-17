@@ -10,6 +10,8 @@ RoutePlanner::RoutePlanner(RouteModel &model, float start_x, float start_y, floa
 
     this->start_node = &(m_Model.FindClosestNode(start_x, start_y));
     this->end_node = &(m_Model.FindClosestNode(end_x, end_y));
+
+    this->start_node->visited = true;
 }
 
 
@@ -55,7 +57,7 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
     distance = 0.0f;
     std::vector<RouteModel::Node> path_found;
 
-    while (current_node != this->start_node) {
+    while (current_node->x != this->start_node->x && current_node->y != this->start_node->y) {
         path_found.push_back(*current_node);
         distance += current_node->distance(*(current_node->parent));
 
@@ -72,16 +74,19 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
 }
 
 
-// TODO 7: Write the A* Search algorithm here.
-// Tips:
-// - Use the AddNeighbors method to add all of the neighbors of the current node to the open_list.
-// - Use the NextNode() method to sort the open_list and return the next node.
-// - When the search has reached the end_node, use the ConstructFinalPath method to return the final path that was found.
-// - Store the final path in the m_Model.path attribute before the method exits. This path will then be displayed on the map tile.
-
 void RoutePlanner::AStarSearch() {
-    RouteModel::Node *current_node = nullptr;
+    RouteModel::Node *current_node = this->start_node;
+    AddNeighbors(current_node);
 
-    // TODO: Implement your solution here.
+    while(!this->open_list.empty()) {
+        current_node = NextNode();
 
+        if (current_node->x == this->end_node->x &&
+            current_node->y == this->end_node->y) {
+            m_Model.path =  ConstructFinalPath(current_node);
+            return;
+        }
+
+        AddNeighbors(current_node);
+    }
 }
